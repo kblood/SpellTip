@@ -1,0 +1,1853 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="spelldata.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.ko.lua"/>
+	<Script file="localization.lua"/>
+	<Script file="TheoryCraftColours.lua"/>
+	<Script file="TheoryCraftUI.lua"/>
+	<Script file="TheoryCraftMain.lua"/>
+	<Script file="TheoryCraftEngine.lua"/>
+	<Script file="TheoryCraftBuffs.lua"/>
+	<Script file="TheoryCraftTalents.lua"/>
+	<Script file="TheoryCraftGear.lua"/>
+	<Script file="TheoryCraftTooltip.lua"/>
+	<Script file="TheoryCraftMessy.lua"/>
+	<Script file="TheoryCraftMitigation.lua"/>
+
+	<EditBox autoFocus="false" frameStrata="HIGH" inherits="InputBoxTemplate" justifyH="CENTER" name="TheoryCraft_EditBoxTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="47" y="20"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				self:SetTextColor(1,1,1)
+			</OnLoad>
+			<OnTextChanged function="TheoryCraft_UpdateEditBox"/>
+		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString inherits="GameFontNormalSmall" name="$parentLabel">
+					<Color b="1" g="1" r="1"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</EditBox>
+
+	<ScrollFrame frameStrata="HIGH" inherits="UIPanelScrollFrameTemplate" name="TheoryCraft_MultiLineEditboxTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="276" y="510"/>
+		</Size>
+		<Frames>
+			<Frame frameStrata="MEDIUM" name="$parent_Background">
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset bottom="5" left="5" right="5" top="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-7" y="7"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="28" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetBackdropColor(0, 0, 0);
+						self:SetBackdropBorderColor(0.4, 0.4, 0.4);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button frameStrata="HIGH" name="$parent_FocusButton">
+				<Size>
+					<AbsDimension x="337" y="510"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 1);
+					</OnLoad>
+					<OnClick>
+						getglobal(self:GetParent():GetName()..&quot;_Text&quot;):SetFocus();
+						self:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<ScrollChild>
+			<EditBox autoFocus="false" enableMouse="true" frameStrata="HIGH" letters="50000" multiLine="true" name="$parent_Text">
+				<Size>
+					<AbsDimension x="276" y="510"/>
+				</Size>
+				<Scripts>
+					<OnLoad>
+						self:SetHeight(self:GetParent():GetHeight());
+						self:SetWidth(self:GetParent():GetWidth());
+					</OnLoad>
+					<OnTextChanged>local scrollBar = getglobal(self:GetParent():GetName()..&quot;ScrollBar&quot;)
+						self:GetParent():UpdateScrollChildRect();
+						local min, max = scrollBar:GetMinMaxValues();
+						if ( max &gt;0 and (self.max ~= max) ) then
+						self.max = max;
+						scrollBar:SetValue(max);
+						end
+						if (self:GetParent().textChanged) then
+						self:GetParent().textChanged();
+						end
+					</OnTextChanged>
+					<OnEscapePressed>self:ClearFocus();
+						getglobal(self:GetParent():GetName()..&quot;_FocusButton&quot;):Show();
+					</OnEscapePressed>
+					<OnHide>getglobal(self:GetParent():GetName()..&quot;_FocusButton&quot;):Show();
+					</OnHide>
+				</Scripts>
+				<FontString font="Fonts\ARIALN.TTF">
+					<Color b="1" g="1" r="1"/>
+					<FontHeight>
+						<AbsValue val="12"/>
+					</FontHeight>
+				</FontString>
+			</EditBox>
+		</ScrollChild>
+	</ScrollFrame>
+
+	<Frame inherits="UIDropDownMenuTemplate" name="TheoryCraftDropdownTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="140"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString inherits="GameFontNormalSmall" name="$parentLabel">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="21" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>UIDropDownMenu_Initialize(self, TheoryCraft_InitDropDown)
+			</OnShow>
+			<OnEnter>TheoryCraft_CheckBoxShowDescription(self)
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Frame>
+
+	<CheckButton inherits="CharacterFrameTabButtonTemplate" name="TheoryCraftTabTemplate" virtual="true">
+		<Scripts>
+			<OnClick>PanelTemplates_Tab_OnClick(self, TheoryCraft)
+				TheoryCraft_TabHandler(self)
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton inherits="UICheckButtonTemplate" name="TheoryCraftCheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset bottom="0" left="0" right="-100" top="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>if ( self:GetChecked() ) then
+				PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+				else
+				PlaySound(&quot;igMainMenuOptionCheckBoxOff&quot;);
+				end
+			</OnClick>
+			<OnEnter>if ( self.tooltipText ) then
+				GameTooltip:SetOwner(this, &quot;ANCHOR_RIGHT&quot;);
+				GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( self.tooltipRequirement ) then
+				GameTooltip:AddLine(self.tooltipRequirement, &quot;&quot;, 1.0, 1.0, 1.0);
+				GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton inherits="TheoryCraftCheckButtonTemplate" name="TheoryCraftCBTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Scripts>
+			<OnClick>PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+			</OnClick>
+			<OnLoad function="TheoryCraft_CheckBoxSetText"/>
+			<OnClick>TheoryCraft_CheckBoxToggle(self)
+			</OnClick>
+			<OnEnter>TheoryCraft_CheckBoxShowDescription(self)
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton inherits="UICheckButtonTemplate" name="TheoryCraftCheckBoxTemplate" virtual="true">
+		<Scripts>
+			<OnClick>if ( self:GetChecked() ) then
+				PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+				else
+				PlaySound(&quot;igMainMenuOptionCheckBoxOff&quot;);
+				end
+			</OnClick>
+			<OnEnter>if ( self.tooltipText ) then
+				GameTooltip:SetOwner(this, &quot;ANCHOR_RIGHT&quot;);
+				GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( self.tooltipRequirement ) then
+				GameTooltip:AddLine(self.tooltipRequirement, &quot;&quot;, 1.0, 1.0, 1.0);
+				GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton inherits="TheoryCraftCheckBoxTemplate" name="TheoryCraftCB2Template" virtual="true">
+		<HitRectInsets>
+			<AbsInset bottom="0" left="0" right="-70" top="0"/>
+		</HitRectInsets>
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Scripts>
+			<OnClick>PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+			</OnClick>
+			<OnLoad function="TheoryCraft_CheckBoxSetText"/>
+			<OnClick>TheoryCraft_CheckBoxToggle(self)
+			</OnClick>
+			<OnEnter>TheoryCraft_CheckBoxShowDescription(self)
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton inherits="TheoryCraftCheckBoxTemplate" name="TheoryCraftCBoxTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Scripts>
+			<OnClick>PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+			</OnClick>
+			<OnLoad function="TheoryCraft_CheckBoxSetText"/>
+			<OnClick>TheoryCraft_CheckBoxToggle(self)
+			</OnClick>
+			<OnEnter>TheoryCraft_CheckBoxShowDescription(self)
+			</OnEnter>
+			<OnLeave>GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<Button inherits="OptionsButtonTemplate" name="TheoryCraftButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="73" y="20"/>
+		</Size>
+		<Scripts>
+			<OnClick>PlaySound(&quot;igMainMenuOptionCheckBoxOn&quot;);
+				TheoryCraft_OutfitChange()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT" justifyV="TOP" name="TheoryCraftTitleTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="11"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="140" y="11"/>
+		</Size>
+		<Color b="0.1" g="1.0" r="1.0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="RIGHT" justifyV="TOP" name="TheoryCraftOutfitLeftTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="60" y="11"/>
+		</Size>
+		<Color b="1.0" g="1.0" r="1.0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT" justifyV="TOP" name="TheoryCraftOutfitRightTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="300" y="11"/>
+		</Size>
+		<Color b="0.1" g="1.0" r="0.1"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT" justifyV="TOP" name="TheoryCraftLeftTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="140" y="116"/>
+		</Size>
+		<Color b="1.0" g="1.0" r="1.0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT" justifyV="TOP" name="TheoryCraftRightTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="300" y="116"/>
+		</Size>
+		<Color b="0.1" g="1.0" r="0.1"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<FontString font="Fonts\FRIZQT__.TTF" justifyH="RIGHT" justifyV="TOP" name="TheoryCraftTalentTitleTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10.5"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="85" y="90"/>
+		</Size>
+		<Color b="1.0" g="1.0" r="1.0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+	</FontString>
+
+	<Button font="Fonts\FRIZQT__.TTF" inherits="OptionsButtonTemplate" justifyH="MIDDLE" justifyV="TOP" name="TheoryCraftTalentTemplate" virtual="true">
+		<FontHeight>
+			<AbsValue val="10.5"/>
+		</FontHeight>
+		<Size>
+			<AbsDimension x="11" y="11"/>
+		</Size>
+		<Color b="0.1" g="1.0" r="0.1"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="2" y="-2"/>
+			</Offset>
+			<Color b="0.1" g="0.1" r="0.1"/>
+		</Shadow>
+		<Scripts>
+			<OnClick>TheoryCraft_SetTalent()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame enableMouse="true" hidden="true" movable="true" name="TheoryCraft" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-20"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="340" y="400"/>
+		</Size>
+		<Scripts>
+			<OnMouseDown>self:StartMoving()
+			</OnMouseDown>
+			<OnDragStart>self:StartMoving()
+			</OnDragStart>
+			<OnDragStop>self:StopMovingOrSizing()
+				TheoryCraft_UpdateDummyButtonText()
+			</OnDragStop>
+			<OnMouseUp>self:StopMovingOrSizing()
+				TheoryCraft_UpdateDummyButtonText()
+			</OnMouseUp>
+			<OnLoad function="TheoryCraft_OnLoad"/>
+			<OnEvent function="TheoryCraft_OnEvent"/>
+		</Scripts>
+		<Frames>
+			<CheckButton id="1" inherits="TheoryCraftTabTemplate" name="TheoryCraftTab1" text="Tooltip">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton id="2" inherits="TheoryCraftTabTemplate" name="TheoryCraftTab2" text="Button Text">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeto="TheoryCraftTab1">
+						<Offset>
+							<AbsDimension x="-18" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton id="3" inherits="TheoryCraftTabTemplate" name="TheoryCraftTab3" text="Vitals">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeto="TheoryCraftTab2">
+						<Offset>
+							<AbsDimension x="-18" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame name="TheoryCraftSettingsTab" parent="TheoryCraft">
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset bottom="11" left="11" right="12" top="12"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="340" y="400"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" name="TheoryCraftExtraLineHeading" text="Embed Line:">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color b="0" g="1" r="1.0"/>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" name="TheoryCraftRestHeading" text="Extended Info:">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color b="0" g="1" r="1.0"/>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="-70"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" name="TheoryCraftMitHeading" text="Calculation Settings:">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color b="0" g="1" r="1.0"/>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="-332"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftembedstyle1">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftExtraLineHeading">
+								<Offset>
+									<AbsDimension x="9" y="-14"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftembedstyle2">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftembedstyle1">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftembedstyle3">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftembedstyle1">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCrafttitles">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TheoryCraftRestHeading">
+								<Offset>
+									<AbsDimension x="9" y="-14"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftembed">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCrafttitles">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftcrit">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftembed">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftcritdam">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftcrit">
+								<Offset>
+									<AbsDimension x="15" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftsepignite">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftcritdam">
+								<Offset>
+									<AbsDimension x="15" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftrollignites">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftsepignite">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdps">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftrollignites">
+								<Offset>
+									<AbsDimension x="-30" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftcombinedot">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdps">
+								<Offset>
+									<AbsDimension x="15" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdotoverct">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftcombinedot">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCrafthps">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdotoverct">
+								<Offset>
+									<AbsDimension x="-15" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdpsdam">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCrafthps">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftaveragedam">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdpsdam">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftprocs">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftaveragedam">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftmitigation">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftprocs">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftresists">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftmitigation">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftaveragethreat">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftresists">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftplusdam">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCrafttitles">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdamcoef">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftplusdam">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdameff">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdamcoef">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdamfinal">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdameff">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCrafthealanddamage">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdamfinal">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftnextagi">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCrafthealanddamage">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftnextstr">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftnextagi">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftnextcrit">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftnextstr">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftnexthit">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftnextcrit">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftnextpen">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftnexthit">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftmana">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftnextpen">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdpm">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftmana">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCrafthpm">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdpm">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftmax">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCrafthpm">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftmaxevoc">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftmax">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftlifetap">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftmaxevoc">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftdontcrit">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TheoryCraftMitHeading">
+								<Offset>
+									<AbsDimension x="9" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCB2Template" name="TheoryCraftdontresist">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdontcrit">
+								<Offset>
+									<AbsDimension x="122" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftuseglock">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="TheoryCraftdontresist">
+								<Offset>
+									<AbsDimension x="90" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftresistArcane">
+						<Size>
+							<AbsDimension x="30" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TheoryCraftdontcrit">
+								<Offset>
+									<AbsDimension x="32" y="-19"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Ar:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftresistFire">
+						<Size>
+							<AbsDimension x="30" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftresistArcane">
+								<Offset>
+									<AbsDimension x="19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Fi:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftresistNature">
+						<Size>
+							<AbsDimension x="30" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftresistFire">
+								<Offset>
+									<AbsDimension x="22" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Na:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftresistFrost">
+						<Size>
+							<AbsDimension x="30" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftresistNature">
+								<Offset>
+									<AbsDimension x="19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Fr:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftresistShadow">
+						<Size>
+							<AbsDimension x="30" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftresistFrost">
+								<Offset>
+									<AbsDimension x="19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Sh:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+				</Frames>
+			</Frame>
+			<Frame hidden="true" name="TheoryCraftButtonTextTab" parent="TheoryCraft">
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset bottom="11" left="11" right="12" top="12"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="340" y="400"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" name="TheoryCraftGenDesc" text="By default TheoryCraft will show button text on all spells.  To limit it to a select few, type the spell names in the edit box below.  Click 'Add All Spells' to see the format.">
+							<Size>
+								<AbsDimension x="300" y="50"/>
+							</Size>
+							<Color b="0" g="1" r="1.0"/>
+							<Anchors>
+								<Anchor point="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="113"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftbuttontext">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="25" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Frame enableMouse="true" id="1" inherits="TheoryCraftDropdownTemplate" name="TheoryCrafttryfirst">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-50"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame enableMouse="true" id="3" inherits="TheoryCraftDropdownTemplate" name="TheoryCrafttryfirstsfg">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCrafttryfirst">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame enableMouse="true" id="2" inherits="TheoryCraftDropdownTemplate" name="TheoryCrafttrysecond">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCrafttryfirst">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame enableMouse="true" id="4" inherits="TheoryCraftDropdownTemplate" name="TheoryCrafttrysecondsfg">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCrafttrysecond">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<ScrollFrame inherits="TheoryCraft_MultiLineEditboxTemplate" name="TheoryCraftGenBox">
+						<Size>
+							<AbsDimension x="276" y="60"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="-10" y="46"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>self.textChanged = TheoryCraft_GenBoxEditChange
+							</OnLoad>
+						</Scripts>
+					</ScrollFrame>
+					<Frame frameStrata="MEDIUM" name="TheoryCraftActionButtonBackground">
+						<Backdrop bgFile="Interface\Icons\Spell_Frost_IceShard">
+							<TileSize>
+								<AbsValue val="108"/>
+							</TileSize>
+						</Backdrop>
+						<Size>
+							<AbsDimension x="108" y="108"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="22" y="172"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Frame enableMouse="true" frameStrata="MEDIUM" movable="true" name="TheoryCraftActionButtonTextPos">
+								<Size>
+									<AbsDimension x="108" y="108"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+									<Anchor point="BOTTOMRIGHT"/>
+								</Anchors>
+								<Scripts>
+									<OnMouseDown>self:StartMoving()
+									</OnMouseDown>
+									<OnDragStart>self:StartMoving()
+									</OnDragStart>
+									<OnDragStop>self:StopMovingOrSizing()
+										TheoryCraft_UpdateButtonTextPos()
+									</OnDragStop>
+									<OnMouseUp>self:StopMovingOrSizing()
+										TheoryCraft_UpdateButtonTextPos()
+									</OnMouseUp>
+								</Scripts>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString inherits="TheoryCraftLeftTemplate" name="TheoryCraftdummytext" text="1000">
+											<Anchors>
+												<Anchor point="TOPLEFT"/>
+												<Anchor point="BOTTOMRIGHT"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Frames>
+									<CheckButton inherits="TheoryCraftCBoxTemplate" name="TheoryCraftalignright">
+										<Anchors>
+											<Anchor point="RIGHT" relativePoint="RIGHT"/>
+										</Anchors>
+									</CheckButton>
+									<CheckButton inherits="TheoryCraftCBoxTemplate" name="TheoryCraftalignleft">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="LEFT"/>
+										</Anchors>
+									</CheckButton>
+								</Frames>
+							</Frame>
+						</Frames>
+					</Frame>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftFontSize">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-34" y="-131"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Font Size:   &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftFontPath">
+						<Size>
+							<AbsDimension x="131" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="TheoryCraftFontSize">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Path:   &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColB">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="TheoryCraftFontPath">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;B:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColG">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TheoryCraftColB">
+								<Offset>
+									<AbsDimension x="-19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;G:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColR">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TheoryCraftColG">
+								<Offset>
+									<AbsDimension x="-19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Color:  R:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColB2">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="TheoryCraftColB">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;B:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColG2">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TheoryCraftColB2">
+								<Offset>
+									<AbsDimension x="-19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;G:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<EditBox inherits="TheoryCraft_EditBoxTemplate" name="TheoryCraftColR2">
+						<Size>
+							<AbsDimension x="25" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TheoryCraftColG2">
+								<Offset>
+									<AbsDimension x="-19" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName()..&quot;Label&quot;):SetText(&quot;Col 2:  R:  &quot;)
+							</OnLoad>
+						</Scripts>
+					</EditBox>
+					<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftSetToAll" text="Add All Spells">
+						<Size>
+							<AbsDimension x="100" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftGenAll" text="Time/Generate">
+						<Size>
+							<AbsDimension x="100" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftSetToAll">
+								<Offset>
+									<AbsDimension x="2" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<CheckButton inherits="TheoryCraftCBTemplate" name="TheoryCraftframebyframe">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftGenAll">
+								<Offset>
+									<AbsDimension x="2" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame hidden="true" name="TheoryCraftOutfitTab" parent="TheoryCraft">
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset bottom="11" left="11" right="12" top="12"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="340" y="400"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="TheoryCraftTitleTemplate" name="TheoryCraftVitalsTitle" text="Your Vitals:">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftLeftTemplate" name="TheoryCraftVitalsLeft" text="Mod1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftVitalsTitle">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftRightTemplate" name="TheoryCraftVitalsRight" text="ab">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftVitalsLeft">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTitleTemplate" name="TheoryCraftStatsTitle" text="Stats:">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftVitalsLeft">
+									<Offset>
+										<AbsDimension x="-10" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftLeftTemplate" name="TheoryCraftStatsLeft" text="Mod1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftStatsTitle">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftRightTemplate" name="TheoryCraftStatsRight" text="ab">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftStatsLeft">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTitleTemplate" name="TheoryCraftModTitle" text="Modifiers:">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftStatsLeft">
+									<Offset>
+										<AbsDimension x="-10" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftLeftTemplate" name="TheoryCraftModsLeft" text="Mod1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftModTitle">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftRightTemplate" name="TheoryCraftModsRight" text="ab">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftModsLeft">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTitleTemplate" name="TheoryCraftTalentTitle" text="Talents">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftOutfitTab">
+									<Offset>
+										<AbsDimension x="20" y="130"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTalentTitleTemplate" name="TheoryCraftTalentTree1" text="Imp. Drain Life">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftTalentTitle">
+									<Offset>
+										<AbsDimension x="6" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTalentTitleTemplate" name="TheoryCraftTalentTree2" text="Imp. Drain Life">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftTalentTree1">
+									<Offset>
+										<AbsDimension x="13" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTalentTitleTemplate" name="TheoryCraftTalentTree3" text="Imp. Drain Life">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftTalentTree2">
+									<Offset>
+										<AbsDimension x="13" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="TheoryCraftTitleTemplate" name="TheoryCraftOutfitTitle" text="Outfits:">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftOutfitTab">
+									<Offset>
+										<AbsDimension x="20" y="26"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame enableMouse="true" id="5" inherits="TheoryCraftDropdownTemplate" name="TheoryCraftoutfit">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="TheoryCraftOutfitTab">
+								<Offset>
+									<AbsDimension x="68" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftResetButton" text="Reset">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="TheoryCraftoutfit">
+								<Offset>
+									<AbsDimension x="28" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent11" text="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRight" relativeTo="TheoryCraftTalentTree1">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent12" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent11">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent13" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent12">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent14" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent13">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent15" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent14">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent16" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent15">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent17" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent16">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent18" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent17">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent21" text="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRight" relativeTo="TheoryCraftTalentTree2">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent22" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent21">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent23" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent22">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent24" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent23">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent25" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent24">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent26" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent25">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent27" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent26">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent28" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent27">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent31" text="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRight" relativeTo="TheoryCraftTalentTree3">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent32" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent31">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent33" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent32">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent34" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent33">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent35" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent34">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent36" text="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent35">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent37" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent36">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button inherits="TheoryCraftTalentTemplate" name="TheoryCraftTalent38" text="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="TheoryCraftTalent37">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+			<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftClose" text="X">
+				<Size>
+					<AbsDimension x="18" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="TheoryCraft">
+						<Offset>
+							<AbsDimension x="-2" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="TheoryCraftTitleFrame" parent="TheoryCraft">
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-4"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="95" y="27"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header" name="TheoryCraftFrameTitle">
+					<Size>
+						<AbsDimension x="200" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Fontstring inherits="GameFontNormal" name="TheoryCraftTitle" text="TheoryCraft">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color a="1" b="1" g="1" r="1"/>
+				</Fontstring>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame enableMouse="true" hidden="true" movable="true" name="TheoryCraftCustomOutfit" parent="TheoryCraft">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="TheoryCraft">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="300" y="300"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<BackgroundInsets>
+				<AbsInset bottom="11" left="11" right="12" top="12"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" name="TheoryCraftCustomDesc" text="ALT-clicking an item link or item button will have TC equip it, updating your tooltips accordingly.">
+					<Size>
+						<AbsDimension x="250" y="50"/>
+					</Size>
+					<Color b="0" g="1" r="1.0"/>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="2" y="-208"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="TheoryCraftOutfitLeftTemplate" name="TheoryCraftCustomLeft" text="Head:">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="TheoryCraftCustomOutfit">
+							<Offset>
+								<AbsDimension x="16" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="TheoryCraftOutfitRightTemplate" name="TheoryCraftCustomRight" text="Robe of the Archmage">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="Right" relativeTo="TheoryCraftCustomLeft">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftEquipTargetButton" parent="TheoryCraftCustomOutfit" text="Target">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeto="TheoryCraftCustomOutfit">
+						<Offset>
+							<AbsDimension x="40" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftEquipSelfButton" parent="TheoryCraftCustomOutfit" text="Self">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeto="TheoryCraftEquipTargetButton">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button inherits="TheoryCraftButtonTemplate" name="TheoryCraftClearButton" parent="TheoryCraftCustomOutfit" text="Reset">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeto="TheoryCraftEquipSelfButton">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<GameTooltip hidden="true" inherits="GameTooltipTemplate" name="TheoryCraftTooltip" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				self:SetOwner(UIParent, &quot;ANCHOR_NONE&quot;);
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	<GameTooltip hidden="true" inherits="GameTooltipTemplate" name="TCTooltip" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				self:SetOwner(UIParent, &quot;ANCHOR_NONE&quot;);
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	<GameTooltip hidden="true" inherits="GameTooltipTemplate" name="TCTooltip2" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				self:SetOwner(UIParent, &quot;ANCHOR_NONE&quot;);
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	<Frame name="TheoryCraftUpdater" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="10" y="10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="0" y="0"/>
+		</Size>
+		<Scripts>
+			<OnUpdate>if not TheoryCraft_Data.TalentsHaveBeenRead then
+				TheoryCraft_UpdateTalents()
+				end
+				TheoryCraft_UpdatedThisRound = nil
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

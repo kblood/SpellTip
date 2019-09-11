@@ -1,0 +1,6 @@
+## Interface: 11320
+## Title: spellTip
+## Version: 1.13.2
+## Notes: Adds more spell information to the ingame tooltips
+## Author: CainBloodbane
+spellTip.lua
