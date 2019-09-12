@@ -21,7 +21,8 @@ local leftline, rightline, rightlinewasnil, _, doheal, timer
 local returnvalue, colour
 
 function TheoryCraft_AddTooltipInfo(frame, dontshow)
-	if TheoryCraft_Settings["off"] then return frame end
+	-- if TheoryCraft_Settings["off"] then return frame end
+	if true then return frame end
 	local tooltipdata = TheoryCraft_GetSpellDataByFrame(frame, true)
 	if tooltipdata == nil then
 		if (frame:NumLines() == 1) and (getglobal(frame:GetName().."TextLeft1"):GetText() ~= "Attack") then

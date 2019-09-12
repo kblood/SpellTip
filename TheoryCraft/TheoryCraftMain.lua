@@ -560,12 +560,12 @@ end
 
 --- OnShow ---
 
-function TheoryCraft_OnShow()
-    	TheoryCraft_AddTooltipInfo(GameTooltip)
-	if (TheoryCraft_OnShow_Save) then
-	    	TheoryCraft_OnShow_Save()
-	end
-end
+-- function TheoryCraft_OnShow()
+--     	TheoryCraft_AddTooltipInfo(GameTooltip)
+-- 	if (TheoryCraft_OnShow_Save) then
+-- 	    	TheoryCraft_OnShow_Save()
+-- 	end
+-- end
 
 function TheoryCraft_GLOCK_UpdateResist(this, arg1)
 	this:OldSetText(arg1)
@@ -619,20 +619,20 @@ function TheoryCraft_OnEvent(self, event, ...)
 		TheoryCraft_Data["oldGBMSB"] = GB_Spellbook_UpdatePage
 		GB_Spellbook_UpdatePage = TheoryCraft_GB_Spellbook_UpdatePage
 
-		TheoryCraft_Data["oldNurfed"] = Nurfed_ActionButton_OnUpdate
-		Nurfed_ActionButton_OnUpdate = TheoryCraft_Nurfed_ActionButton_OnUpdate
+		-- TheoryCraft_Data["oldNurfed"] = Nurfed_ActionButton_OnUpdate
+		-- Nurfed_ActionButton_OnUpdate = TheoryCraft_Nurfed_ActionButton_OnUpdate
 
-		TheoryCraft_Data["PaperDollItemSlotButton_OnClick"] = PaperDollItemSlotButton_OnClick
-		PaperDollItemSlotButton_OnClick = TheoryCraft_PaperDollItemSlotButton_OnClick
+		-- TheoryCraft_Data["PaperDollItemSlotButton_OnClick"] = PaperDollItemSlotButton_OnClick
+		-- PaperDollItemSlotButton_OnClick = TheoryCraft_PaperDollItemSlotButton_OnClick
 
-		TheoryCraft_Data["InspectPaperDollItemSlotButton_OnClick"] = InspectPaperDollItemSlotButton_OnClick
-		InspectPaperDollItemSlotButton_OnClick = TheoryCraft_InspectPaperDollItemSlotButton_OnClick
+		-- TheoryCraft_Data["InspectPaperDollItemSlotButton_OnClick"] = InspectPaperDollItemSlotButton_OnClick
+		-- InspectPaperDollItemSlotButton_OnClick = TheoryCraft_InspectPaperDollItemSlotButton_OnClick
 
-		TheoryCraft_Data["SuperInspect_InspectPaperDollItemSlotButton_OnClick"] = SuperInspect_InspectPaperDollItemSlotButton_OnClick
-		SuperInspect_InspectPaperDollItemSlotButton_OnClick = TheoryCraft_SuperInspect_InspectPaperDollItemSlotButton_OnClick
+		-- TheoryCraft_Data["SuperInspect_InspectPaperDollItemSlotButton_OnClick"] = SuperInspect_InspectPaperDollItemSlotButton_OnClick
+		-- SuperInspect_InspectPaperDollItemSlotButton_OnClick = TheoryCraft_SuperInspect_InspectPaperDollItemSlotButton_OnClick
 
-		TheoryCraft_Data["ContainerFrameItemButton_OnClick"] = ContainerFrameItemButton_OnClick
-		ContainerFrameItemButton_OnClick = TheoryCraft_ContainerFrameItemButton_OnClick
+		-- TheoryCraft_Data["ContainerFrameItemButton_OnClick"] = ContainerFrameItemButton_OnClick
+		-- ContainerFrameItemButton_OnClick = TheoryCraft_ContainerFrameItemButton_OnClick
 
 		if ISync then
 			TheoryCraft_Data["ISync:ButtonClick"] = ISync.ButtonClick

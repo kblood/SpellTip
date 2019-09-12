@@ -1830,7 +1830,10 @@ function TheoryCraft_GetSpellDataByDescription(description, force)
 		if spellrank == nil then spellrank = 0 end
 		TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 		TCTooltip:SetSpellByID(i)
-		testdesc = getglobal("TCTooltipTextLeft"..TCTooltip:NumLines()):GetText()
+		if(getglobal("TCTooltipTextLeft"..TCTooltip:NumLines())) then
+			testdesc = getglobal("TCTooltipTextLeft"..TCTooltip:NumLines()):GetText()
+		end
+		
 		if testdesc == description then
 			TheoryCraft_GenerateTooltip(TCTooltip, spellname, spellrank, i, true)
 			return UpdateTarget(TheoryCraft_TooltipData[description]) or TheoryCraft_TooltipData[description]
