@@ -89,7 +89,7 @@ local function UpdateCustomOutfit()
 	end
 end
 
-function TheoryCraft_TabHandler(this)
+function TheoryCraft_TabHandler()
 	local name = this:GetName()
 	name = tonumber(string.sub(name, 15))
 	TheoryCraftSettingsTab:Hide()
@@ -282,7 +282,7 @@ function TheoryCraft_UpdateOutfitTab()
 		TheoryCraftAddStat("Agility", math.floor(TheoryCraft_GetStat("agility")))
 		TheoryCraftAddStat("Spirit", math.floor(TheoryCraft_GetStat("spirit")))
 	elseif (class == "DRUID") then
-		if UnitPowerMax("player") == 100 then
+		if UnitManaMax("player") == 100 then
 			TheoryCraftAddVital("Attack Power", math.floor(TheoryCraft_GetStat("attackpower")))
 			TheoryCraftAddVital("Crit Chance", round(TheoryCraft_GetStat("meleecritchancereal"), 2).."%")
 			TheoryCraftAddVital("Agi per Crit", round(TheoryCraft_agipercrit, 2))
@@ -366,35 +366,35 @@ function TheoryCraft_UpdateOutfitTab()
 	UpdateCustomOutfit()
 end
 
-function TheoryCraft_Combo1Click(this)
+function TheoryCraft_Combo1Click()
 	local optionID = this:GetID()
 	UIDropDownMenu_SetSelectedID(TheoryCrafttryfirst, optionID)
 	TheoryCraft_Settings["tryfirst"] = this.value
 	TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
 end
 
-function TheoryCraft_Combo2Click(this)
+function TheoryCraft_Combo2Click()
 	local optionID = this:GetID()
 	UIDropDownMenu_SetSelectedID(TheoryCrafttrysecond, optionID)
 	TheoryCraft_Settings["trysecond"] = this.value
 	TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
 end
 
-function TheoryCraft_Combo3Click(this)
+function TheoryCraft_Combo3Click()
 	local optionID = this:GetID()
 	UIDropDownMenu_SetSelectedID(TheoryCrafttryfirstsfg, optionID)
 	TheoryCraft_Settings["tryfirstsfg"] = this.value
 	TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
 end
 
-function TheoryCraft_Combo4Click(this)
+function TheoryCraft_Combo4Click()
 	local optionID = this:GetID()
 	UIDropDownMenu_SetSelectedID(TheoryCrafttrysecondsfg, optionID)
 	TheoryCraft_Settings["trysecondsfg"] = this.value
 	TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
 end
 
-function TheoryCraft_OutfitClick(this)
+function TheoryCraft_OutfitClick()
 	UIDropDownMenu_SetSelectedID(TheoryCraftoutfit, this:GetID())
 	TheoryCraft_Data["outfit"] = this.value
 	if this.value == 2 then
@@ -434,7 +434,7 @@ local function AddButton(i, text, value, func, remaining)
 	return i + 1
 end
 
-function TheoryCraft_InitDropDown(this)
+function TheoryCraft_InitDropDown()
 	local a
 	local i = 1
 	if string.find(this:GetName(), "TheoryCraftoutfit") then
@@ -593,9 +593,9 @@ function TheoryCraft_GB_Spellbook_UpdatePage(start, finish)
 	end
 end
 
-function TheoryCraft_ButtonUpdate(this, ...)
+function TheoryCraft_ButtonUpdate()
 	if this.oldupdatescript then
-		this.oldupdatescript(this, ...)
+		this.oldupdatescript()
 	end
 	if (TheoryCraft_Settings["framebyframe"] or UnitAffectingCombat("player")) and TheoryCraft_UpdatedThisRound then
 		return
@@ -697,7 +697,7 @@ function TheoryCraft_ButtonUpdate(this, ...)
 				spelldata = TheoryCraft_GetSpellDataByName(id, id2)
 			end
 		elseif buttontext.type == "GBMiniSpellBook" then
-			local spellname, spellrank = GetSpellBookItemName(buttontext.ID, "BOOKTYPE_SPELL");
+			local spellname, spellrank = GetSpellName(buttontext.ID, "BOOKTYPE_SPELL");
 			if spellname then
 				spellrank = tonumber(findpattern(spellrank, "%d+"))
 				if spellrank == nil then spellrank = 0 end

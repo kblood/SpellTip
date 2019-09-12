@@ -21,8 +21,7 @@ local leftline, rightline, rightlinewasnil, _, doheal, timer
 local returnvalue, colour
 
 function TheoryCraft_AddTooltipInfo(frame, dontshow)
-	-- if TheoryCraft_Settings["off"] then return frame end
-	if true then return frame end
+	if TheoryCraft_Settings["off"] then return frame end
 	local tooltipdata = TheoryCraft_GetSpellDataByFrame(frame, true)
 	if tooltipdata == nil then
 		if (frame:NumLines() == 1) and (getglobal(frame:GetName().."TextLeft1"):GetText() ~= "Attack") then
@@ -33,7 +32,7 @@ function TheoryCraft_AddTooltipInfo(frame, dontshow)
 			local spellname, spellrank
 			local i2 = 1
 			while (true) do
-				spellname, spellrank = GetSpellBookItemName(i2,BOOKTYPE_SPELL)
+				spellname, spellrank = GetSpellName(i2,BOOKTYPE_SPELL)
 				if spellname == nil then return end
 				spellrank = tonumber(findpattern(spellrank2, "%d+"))
 				if spellrank == nil then spellrank2 = 0 end
