@@ -32,7 +32,7 @@ function TheoryCraft_AddTooltipInfo(frame, dontshow)
 			local spellname, spellrank
 			local i2 = 1
 			while (true) do
-				spellname, spellrank = GetSpellName(i2,BOOKTYPE_SPELL)
+				spellname, spellrank = GetSpellBookItemName(i2,BOOKTYPE_SPELL)
 				if spellname == nil then return end
 				spellrank = tonumber(findpattern(spellrank2, "%d+"))
 				if spellrank == nil then spellrank2 = 0 end

@@ -333,7 +333,7 @@ function TheoryCraft_SetItemRef(link, text, button)
 	end
 end
 
-function TheoryCraft_ContainerFrameItemButton_OnClick(button, ignoremodifiers)
+function TheoryCraft_ContainerFrameItemButton_OnClick(this, button, ignoremodifiers)
 	if (IsAltKeyDown()) and (button == "LeftButton") and (not ignoremodifiers) and ((AuctionFrame == nil) or (not AuctionFrame:IsVisible())) then
 		TheoryCraft_AddToCustom(GetContainerItemLink(this:GetParent():GetID(), this:GetID()))
 		TheoryCraft_UpdateGear("player", true)
@@ -343,7 +343,7 @@ function TheoryCraft_ContainerFrameItemButton_OnClick(button, ignoremodifiers)
 	TheoryCraft_Data["ContainerFrameItemButton_OnClick"](button, ignoremodifiers)
 end
 
-function TheoryCraft_PaperDollItemSlotButton_OnClick(arg1)
+function TheoryCraft_PaperDollItemSlotButton_OnClick(this, arg1)
 	if (arg1 == "LeftButton") and (IsAltKeyDown()) then
 		TheoryCraft_AddToCustom(GetInventoryItemLink("player", this:GetID()))
 		TheoryCraft_UpdateGear("player", true)
@@ -353,7 +353,7 @@ function TheoryCraft_PaperDollItemSlotButton_OnClick(arg1)
 	TheoryCraft_Data["PaperDollItemSlotButton_OnClick"](arg1)
 end
 
-function TheoryCraft_SuperInspect_InspectPaperDollItemSlotButton_OnClick(arg1)
+function TheoryCraft_SuperInspect_InspectPaperDollItemSlotButton_OnClick(this, arg1)
 	if (arg1 == "LeftButton") and (IsAltKeyDown()) then
 		TheoryCraft_AddToCustom(GetInventoryItemLink("target", GetInventorySlotInfo(string.sub(this:GetName(), 21))))
 		TheoryCraft_UpdateGear("player", true)
@@ -364,7 +364,7 @@ function TheoryCraft_SuperInspect_InspectPaperDollItemSlotButton_OnClick(arg1)
 end
 
 
-function TheoryCraft_InspectPaperDollItemSlotButton_OnClick(arg1)
+function TheoryCraft_InspectPaperDollItemSlotButton_OnClick(this, arg1)
 	if (arg1 == "LeftButton") and (IsAltKeyDown()) then
 		Print(this:GetName())
 		TheoryCraft_AddToCustom(GetInventoryItemLink("target", this:GetID()))
@@ -375,7 +375,7 @@ function TheoryCraft_InspectPaperDollItemSlotButton_OnClick(arg1)
 	TheoryCraft_Data["InspectPaperDollItemSlotButton_OnClick"](arg1)
 end
 
-function TheoryCraft_ISyncButtonClick(arg1, sButton)
+function TheoryCraft_ISyncButtonClick(this, arg1, sButton)
 	if (sButton == "LeftButton") and (IsAltKeyDown()) then
 		TheoryCraft_AddToCustom("item:"..this.storeID)
 		TheoryCraft_UpdateGear("player", true)
@@ -385,7 +385,7 @@ function TheoryCraft_ISyncButtonClick(arg1, sButton)
 	TheoryCraft_Data["ISync:ButtonClick"](arg1, sButton)
 end
 
-function TheoryCraft_OnLoad()
+function TheoryCraft_OnLoad(self)
 	if not TheoryCraft_NotStripped then
 		TheoryCraft_Locale.LoadText = string.gsub(TheoryCraft_Locale.LoadText, TheoryCraft_Version, TheoryCraft_Version.." STRIPPED")
 		TheoryCraft_DataVersion = TheoryCraft_DataVersion.." STRIPPED"
@@ -397,8 +397,8 @@ function TheoryCraft_OnLoad()
 	SLASH_TheoryCraft1 = "/theorycraft"
 	SLASH_TheoryCraft2 = "/tc"
 	SlashCmdList["TheoryCraft"] = TheoryCraft_Command
-	this:RegisterEvent("VARIABLES_LOADED")
-	this:RegisterEvent("PLAYER_LOGIN")
+	self:RegisterEvent("VARIABLES_LOADED")
+	self:RegisterEvent("PLAYER_LOGIN")
 	SetDefaults()
 
 	-- Translates and expands out "schoolname" fields
@@ -592,7 +592,7 @@ end
 		BActionButton.Create = TheoryCraft_BActionButtonCreate
 	end
 
-function TheoryCraft_OnEvent()
+function TheoryCraft_OnEvent(self, event, ...)
 	local UIMem = gcinfo()
 	if event == "VARIABLES_LOADED" then
 		if TheoryCraft_AddButtonText then TheoryCraft_AddButtonText() end
@@ -669,34 +669,30 @@ function TheoryCraft_OnEvent()
 			Print("TheoryCraft is currently switched off, type in '/tc on' to enabled")
 		end
 	elseif event == "PLAYER_LOGIN" then
-		this:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-		this:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-		this:RegisterEvent("SPELLS_CHANGED")
-		this:RegisterEvent("UNIT_AURA")
-		this:RegisterEvent("UNIT_INVENTORY_CHANGED")
-		this:RegisterEvent("PLAYER_TARGET_CHANGED")
-		this:RegisterEvent("UNIT_MANA")
-		this:RegisterEvent("CHARACTER_POINTS_CHANGED")
-		this:RegisterEvent("PLAYER_LEAVING_WORLD")
-		this:RegisterEvent("PLAYER_ENTERING_WORLD")
-		this:RegisterEvent("PLAYER_COMBO_POINTS")
-		this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
-		this:RegisterEvent("PLAYER_REGEN_ENABLED")
-		this:RegisterEvent("CHAT_MSG_SPELL_SELF_BUFF")
+		self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+		self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+		self:RegisterEvent("SPELLS_CHANGED")
+		self:RegisterEvent("UNIT_AURA")
+		self:RegisterEvent("UNIT_INVENTORY_CHANGED")
+		self:RegisterEvent("PLAYER_TARGET_CHANGED")
+		self:RegisterEvent("UNIT_MANA")
+		self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+		self:RegisterEvent("PLAYER_LEAVING_WORLD")
+		self:RegisterEvent("PLAYER_ENTERING_WORLD")
+		self:RegisterEvent("UNIT_POWER_UPDATE")
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	elseif event == "PLAYER_LEAVING_WORLD" then
-		this:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
-		this:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
-		this:UnregisterEvent("SPELLS_CHANGED")
-		this:UnregisterEvent("UNIT_AURA")
-		this:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-		this:UnregisterEvent("PLAYER_TARGET_CHANGED")
-		this:UnregisterEvent("UNIT_MANA")
-		this:UnregisterEvent("CHARACTER_POINTS_CHANGED")
-		this:UnregisterEvent("PLAYER_LEAVING_WORLD")
-		this:UnregisterEvent("PLAYER_COMBO_POINTS")
-		this:UnregisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
-		this:UnregisterEvent("PLAYER_REGEN_ENABLED")
-		this:UnregisterEvent("CHAT_MSG_SPELL_SELF_BUFF")
+		self:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
+		self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
+		self:UnregisterEvent("SPELLS_CHANGED")
+		self:UnregisterEvent("UNIT_AURA")
+		self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+		self:UnregisterEvent("UNIT_MANA")
+		self:UnregisterEvent("CHARACTER_POINTS_CHANGED")
+		self:UnregisterEvent("PLAYER_LEAVING_WORLD")
+		self:UnregisterEvent("UNIT_POWER_UPDATE")
+		self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		TheoryCraft_UpdateTalents(true)
 		TheoryCraft_UpdateGear("player", true)
@@ -704,25 +700,17 @@ function TheoryCraft_OnEvent()
 		TheoryCraft_UpdateBuffs("target", true)
 		TheoryCraft_LoadStats()
 		TheoryCraft_GenerateAll()
-		this:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-		this:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
-		this:RegisterEvent("SPELLS_CHANGED")
-		this:RegisterEvent("UNIT_AURA")
-		this:RegisterEvent("UNIT_INVENTORY_CHANGED")
-		this:RegisterEvent("PLAYER_TARGET_CHANGED")
-		this:RegisterEvent("UNIT_MANA")
-		this:RegisterEvent("CHARACTER_POINTS_CHANGED")
-		this:RegisterEvent("PLAYER_LEAVING_WORLD")
-		this:RegisterEvent("PLAYER_COMBO_POINTS")
-		this:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
-		this:RegisterEvent("PLAYER_REGEN_ENABLED")
-		this:RegisterEvent("CHAT_MSG_SPELL_SELF_BUFF")
-	elseif event == "CHAT_MSG_SPELL_SELF_DAMAGE" then
-		if TheoryCraft_ParseCombat then
-			TheoryCraft_ParseCombat(arg1)
-		end
-	elseif event == "CHAT_MSG_SPELL_SELF_BUFF" then
-		TheoryCraft_WatchCritRate(arg1)
+		self:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+		self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+		self:RegisterEvent("SPELLS_CHANGED")
+		self:RegisterEvent("UNIT_AURA")
+		self:RegisterEvent("UNIT_INVENTORY_CHANGED")
+		self:RegisterEvent("PLAYER_TARGET_CHANGED")
+		self:RegisterEvent("UNIT_MANA")
+		self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+		self:RegisterEvent("PLAYER_LEAVING_WORLD")
+		self:RegisterEvent("UNIT_POWER_UPDATE")
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		TheoryCraft_UpdateGear(arg1)
 	elseif event == "PLAYER_REGEN_ENABLED" then
@@ -751,8 +739,11 @@ function TheoryCraft_OnEvent()
 	elseif event == "PLAYER_TARGET_CHANGED" then
 		TheoryCraft_UpdateTarget()
 		TheoryCraft_UpdateBuffs("target")
-	elseif event == "PLAYER_COMBO_POINTS" then
-		TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
+	elseif event == "UNIT_POWER_UPDATE" then
+		local target, powerType = ...
+		if powerType == "COMBO_POINTS" then 
+			TheoryCraft_DeleteTable(TheoryCraft_UpdatedButtons)
+		end
 	elseif (event == "UNIT_MANA") and (arg1 == "player") then
 		if UnitClass("player") == "DRUID" then
 			local _, _, catform = GetShapeshiftFormInfo(3)
@@ -770,7 +761,7 @@ function TheoryCraft_OnEvent()
 	end
 end
 
-function TheoryCraft_CheckBoxShowDescription(arg1)
+function TheoryCraft_CheckBoxShowDescription(this)
 	local name = this:GetName()
 	name = string.sub(name, 12)
 	if (TheoryCraft_CheckButtons[name] == nil) then
@@ -801,22 +792,22 @@ function TheoryCraft_SetCheckBox(variablename)
 	end
 end
 
-function TheoryCraft_CheckBoxSetText(arg1)
-	local name = this:GetName()
+function TheoryCraft_CheckBoxSetText(self)
+	local name = self:GetName()
 	name = string.sub(name, 12)
 	if TheoryCraft_CheckButtons[name] == nil then return end
 	if TheoryCraft_CheckButtons[name].hide then
 		for k,v in pairs(TheoryCraft_CheckButtons[name].hide) do
 			if (class == v) or ((v == "STRIPPED") and (not TheoryCraft_NotStripped)) then
-				getglobal(this:GetName()):Disable()
-				getglobal(this:GetName().."Text"):SetTextColor(0.5, 0.5, 0.5)
+				getglobal(self:GetName()):Disable()
+				getglobal(self:GetName().."Text"):SetTextColor(0.5, 0.5, 0.5)
 			end
 		end
 	end
-	getglobal(this:GetName().."Text"):SetText(TheoryCraft_CheckButtons[name].short)
+	getglobal(self:GetName().."Text"):SetText(TheoryCraft_CheckButtons[name].short)
 end
 
-function TheoryCraft_CheckBoxToggle(arg1)
+function TheoryCraft_CheckBoxToggle(this)
 	local onoff
 	if (this:GetChecked()) then
 		onoff = true
@@ -1124,7 +1115,7 @@ function TheoryCraft_OutfitChange(arg1)
 		local i, i2 = 1
 		local first = true
 		while (true) do
-			spellname, spellrank = GetSpellName(i,BOOKTYPE_SPELL)
+			spellname, spellrank = GetSpellBookItemName(i,BOOKTYPE_SPELL)
 			if spellname == nil then break end
 			spellrank = tonumber(findpattern(spellrank, "%d+"))
 			if spellrank == nil then spellrank = 0 end
@@ -1218,7 +1209,7 @@ function TheoryCraft_OutfitChange(arg1)
 	end
 end
 
-function TheoryCraft_UpdateEditBox()
+function TheoryCraft_UpdateEditBox(this)
 	local s = string.gsub(this:GetName(), "TheoryCraft", "")
 	local text = this:GetText()
 	if s ~= "FontPath" then
